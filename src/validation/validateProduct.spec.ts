@@ -1,10 +1,12 @@
-const validateProduct = require('./validateProduct')
+import { Collection } from 'mongodb'
+
+import validateProduct from './validateProduct'
 
 // Mock the iconsData module
 jest.mock('../icons.data', () => ['icon1', 'icon2', 'icon3'])
 
 describe('validateProduct', () => {
-  let collection
+  let collection: any
 
   beforeEach(() => {
     // Mock the collection object
@@ -18,7 +20,7 @@ describe('validateProduct', () => {
   })
 
   test('should throw an error if name is missing', async () => {
-    await expect(validateProduct(collection, null, 'icon1')).rejects.toEqual({
+    await expect(validateProduct(collection, undefined, 'icon1')).rejects.toEqual({
       error: 'product.name.missing',
       message: 'Product name is missing',
     })
@@ -32,7 +34,7 @@ describe('validateProduct', () => {
   })
 
   test('should throw an error if icon is missing', async () => {
-    await expect(validateProduct(collection, 'Product 1', null)).rejects.toEqual({
+    await expect(validateProduct(collection, 'Product 1', undefined)).rejects.toEqual({
       error: 'product.icon.missing',
       message: 'Product icon is missing',
     })

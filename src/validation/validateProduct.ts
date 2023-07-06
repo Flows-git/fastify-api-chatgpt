@@ -1,6 +1,8 @@
-const iconsData = require('../icons.data')
+import { Collection, Db } from 'mongodb'
 
-const validateProduct = async (collection, name, icon, productId = null) => {
+import iconsData from '../icons.data'
+
+const validateProduct = async (collection: Collection, name?: string, icon?: string, productId?: string) => {
   // Check for required fields
   if (!name) {
     throw { error: 'product.name.missing', message: 'Product name is missing' }
@@ -21,11 +23,11 @@ const validateProduct = async (collection, name, icon, productId = null) => {
     throw { error: 'product.icon.invalid', message: 'Product icon is invalid' }
   }
 
-  // Check if the name is already taken
+  // Check if the name is already taken 
   const existingProduct = await collection.findOne({ name })
-  if (existingProduct && existingProduct._id !== productId) {
+  if (existingProduct && existingProduct._id.toString() !== productId) {
     throw { error: 'product.name.unique', message: 'Product name must be unique' }
   }
 }
 
-module.exports = validateProduct
+export default validateProduct

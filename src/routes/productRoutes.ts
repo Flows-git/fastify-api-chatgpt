@@ -1,15 +1,17 @@
 // productRoutes.js
-const { ObjectId } = require('mongodb')
-const validateProduct = require('../validation/validateProduct')
+import { ObjectId } from 'mongodb'
+import validateProduct from '../validation/validateProduct'
+import { FastifyInstance } from 'fastify'
+import { Product, IdParam } from '../types'
 
 // Product routes
-const productRoutes = async (fastify) => {
+const productRoutes = async (fastify: FastifyInstance) => {
   const db = fastify.getDb() // Retrieve the db instance from fastify
 
   // POST /api/products endpoint
   fastify.post('/api/products', async (request, reply) => {
     try {
-      const { name, icon } = request.body
+      const { name, icon } = request.body as Product
       const collection = db.collection('products')
 
       // Validate the product data
@@ -17,10 +19,10 @@ const productRoutes = async (fastify) => {
 
       // Save the product in the "products" collection
       const result = await collection.insertOne({ name, icon })
-      const savedProduct = result.ops[0]
+      const savedProduct = result.insertedId
 
       reply.code(201).send(savedProduct)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving product:', err)
       reply.code(400).send({ error: err.error, message: err.message })
     }
@@ -28,7 +30,6 @@ const productRoutes = async (fastify) => {
 
   // GET /api/products endpoint
   fastify.get('/api/products', async (request, reply) => {
-    console.log('TEST!', db)
     try {
       const collection = db.collection('products')
       const products = await collection.find().toArray()
@@ -43,7 +44,7 @@ const productRoutes = async (fastify) => {
   fastify.delete('/api/products/:id', async (request, reply) => {
     try {
       const collection = db.collection('products')
-      const { id } = request.params
+      const { id } = request.params as IdParam
       const result = await collection.deleteOne({ _id: new ObjectId(id) })
 
       if (result.deletedCount === 0) {
@@ -61,7 +62,7 @@ const productRoutes = async (fastify) => {
   fastify.get('/api/products/:id', async (request, reply) => {
     try {
       const collection = db.collection('products')
-      const { id } = request.params
+      const { id } = request.params as IdParam
       const product = await collection.findOne({ _id: new ObjectId(id) })
 
       if (!product) {
@@ -78,8 +79,8 @@ const productRoutes = async (fastify) => {
   // POST /api/products/:id endpoint
   fastify.post('/api/products/:id', async (request, reply) => {
     try {
-      const { id } = request.params
-      const { name, icon } = request.body
+      const { id } = request.params as IdParam
+      const { name, icon } = request.body as Product
       const collection = db.collection('products')
 
       // Check if the product with the specified ID exists
@@ -99,11 +100,11 @@ const productRoutes = async (fastify) => {
       const updatedProduct = await collection.findOne({ _id: new ObjectId(id) })
 
       reply.code(200).send(updatedProduct)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating product:', err)
       reply.code(400).send({ error: err.error, message: err.message })
     }
   })
 }
 
-module.exports = productRoutes
+export default productRoutes

@@ -1,12 +1,12 @@
-const fs = require('fs')
-const path = require('path')
+import * as fs from 'fs'
+import * as path from 'path'
 
 // Path to the folder containing the icons
 const iconsFolder = path.join(__dirname, '..', 'public', 'icons')
 
 // Read all PNG files from the folder
 const readIcons = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise<Array<string>>((resolve, reject) => {
     fs.readdir(iconsFolder, (err, files) => {
       if (err) {
         reject(err)
@@ -21,17 +21,17 @@ const readIcons = () => {
 }
 
 // Write the array to the file
-const writeToFile = (array) => {
+const writeToFile = (array: Array<string>) => {
   return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, '..', 'src', 'icons.data.js')
-    const content = `module.exports = ${JSON.stringify(array)};\n`
+    const filePath = path.join(__dirname, '..', 'src', 'icons.data.ts')
+    const content = `export default ${JSON.stringify(array)};\n`
 
     fs.writeFile(filePath, content, (err) => {
       if (err) {
         reject(err)
         return
       }
-      resolve()
+      resolve(true)
     })
   })
 }

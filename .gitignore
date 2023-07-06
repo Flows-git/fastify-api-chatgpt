@@ -1,3 +1,5 @@
 node_modules
 .DS_Store
 src/icons.data.js
+dist
+.nyc_output
