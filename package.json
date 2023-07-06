@@ -7,7 +7,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prettier:check": "prettier --check .",
-    "test": "jest"
+    "test": "jest",
+    "start": "node src/index.js",
+    "script:generate-icons": "node scripts/generateIconData.js"
   },
   "keywords": [],
   "author": "",
