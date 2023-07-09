@@ -1,8 +1,10 @@
-import { Collection, Db } from 'mongodb'
+import { Collection, Db, ObjectId } from 'mongodb'
 
 import iconsData from '../icons.data'
+import { Product } from '../types'
 
-const validateProduct = async (collection: Collection, name?: string, icon?: string, productId?: string) => {
+const validateProduct = async (collection: Collection, product: Product, productId?: string) => {
+  const {name, icon, _id, category } = product
   // Check for required fields
   if (!name) {
     throw { error: 'product.name.missing', message: 'Product name is missing' }
@@ -24,8 +26,8 @@ const validateProduct = async (collection: Collection, name?: string, icon?: str
   }
 
   // Check if the name is already taken 
-  const existingProduct = await collection.findOne({ name })
-  if (existingProduct && existingProduct._id.toString() !== productId) {
+  const existingProduct = await collection.findOne({ name }) as Product
+  if (existingProduct && existingProduct._id.toString() !== productId?.toString()) {
     throw { error: 'product.name.unique', message: 'Product name must be unique' }
   }
 }

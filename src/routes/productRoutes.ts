@@ -1,49 +1,84 @@
 // productRoutes.js
-import { ObjectId } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 import validateProduct from '../validation/validateProduct'
-import { FastifyInstance } from 'fastify'
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { Product, IdParam } from '../types'
+
 
 // Product routes
 const productRoutes = async (fastify: FastifyInstance) => {
   const db = fastify.getDb() // Retrieve the db instance from fastify
+  const collection = db.collection('products')
 
   // POST /api/products endpoint
   fastify.post('/api/products', async (request, reply) => {
     try {
-      const { name, icon } = request.body as Product
-      const collection = db.collection('products')
+      const product = request.body as Product
 
       // Validate the product data
-      await validateProduct(collection, name, icon)
+      await validateProduct(collection, product)
 
       // Save the product in the "products" collection
-      const result = await collection.insertOne({ name, icon })
-      const savedProduct = result.insertedId
+      const result = await collection.insertOne(product)
 
-      reply.code(201).send(savedProduct)
+     // Fetch the created record
+      const createdProduct = await collection.findOne({ _id: result.insertedId })
+
+      reply.code(201).send(createdProduct)
     } catch (err: any) {
       console.error('Error saving product:', err)
       reply.code(400).send({ error: err.error, message: err.message })
     }
   })
 
-  // GET /api/products endpoint
-  fastify.get('/api/products', async (request, reply) => {
+
+
+
+  
+  // GET /api/products endpoint with pagination
+  fastify.get('/api/products', async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     try {
-      const collection = db.collection('products')
-      const products = await collection.find().toArray()
-      reply.code(200).send(products)
+      const { page = 1, perPage = 10, sortBy = 'name', order = 'ASC' } = request.query as any
+  
+      const sortOrder = order === 'DESC' ? -1 : 1
+  
+      // Count total number of products
+      const totalCount = await collection.countDocuments()
+  
+      // Calculate total page count
+      const totalPageCount = Math.ceil(totalCount / perPage)
+  
+      // Calculate skip value based on page and perPage
+      const skip = (page - 1) * perPage
+  
+      // Fetch products with pagination and sorting
+      const products = await collection
+        .find()
+        .skip(skip)
+        .limit(parseInt(perPage))
+        .sort({ [sortBy]: sortOrder })
+        .toArray()
+  
+      // Prepare response
+      const response = {
+        data: products,
+        meta: {
+          totalCount,
+          totalPageCount,
+        },
+      }
+  
+      reply.code(200).send(response)
     } catch (err) {
       console.error('Error retrieving products:', err)
       reply.code(500).send({ error: 'internal_server_error', message: 'Internal server error' })
     }
   })
 
+
   // DELETE /api/products/:id endpoint
   fastify.delete('/api/products/:id', async (request, reply) => {
     try {
-      const collection = db.collection('products')
       const { id } = request.params as IdParam
       const result = await collection.deleteOne({ _id: new ObjectId(id) })
 
@@ -61,7 +96,6 @@ const productRoutes = async (fastify: FastifyInstance) => {
   // GET /api/products/:id endpoint
   fastify.get('/api/products/:id', async (request, reply) => {
     try {
-      const collection = db.collection('products')
       const { id } = request.params as IdParam
       const product = await collection.findOne({ _id: new ObjectId(id) })
 
@@ -80,8 +114,7 @@ const productRoutes = async (fastify: FastifyInstance) => {
   fastify.post('/api/products/:id', async (request, reply) => {
     try {
       const { id } = request.params as IdParam
-      const { name, icon } = request.body as Product
-      const collection = db.collection('products')
+      const product = request.body as Product
 
       // Check if the product with the specified ID exists
       const existingProduct = await collection.findOne({ _id: new ObjectId(id) })
@@ -91,10 +124,11 @@ const productRoutes = async (fastify: FastifyInstance) => {
       }
 
       // Validate the product data, excluding the name of the product being updated
-      await validateProduct(collection, name, icon, id)
+      await validateProduct(collection, product, id)
 
       // Update the record
-      await collection.updateOne({ _id: new ObjectId(id) }, { $set: { name, icon } })
+      delete (product as any)._id
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: product })
 
       // Fetch the updated record
       const updatedProduct = await collection.findOne({ _id: new ObjectId(id) })

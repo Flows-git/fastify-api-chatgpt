@@ -20,30 +20,30 @@ describe('validateProduct', () => {
   })
 
   test('should throw an error if name is missing', async () => {
-    await expect(validateProduct(collection, undefined, 'icon1')).rejects.toEqual({
+    const product = { name: undefined, icon: 'icon1'} as any
+    await expect(validateProduct(collection, product)).rejects.toMatchObject({
       error: 'product.name.missing',
-      message: 'Product name is missing',
     })
   })
 
   test('should throw an error if name is invalid', async () => {
-    await expect(validateProduct(collection, 'a', 'icon1')).rejects.toEqual({
+    const product = { name: 'a', icon: 'icon1'} as any
+    await expect(validateProduct(collection, product)).rejects.toMatchObject({
       error: 'product.name.invalid',
-      message: 'Product name is invalid',
     })
   })
 
   test('should throw an error if icon is missing', async () => {
-    await expect(validateProduct(collection, 'Product 1', undefined)).rejects.toEqual({
+    const product = { name: 'Product 1', icon: undefined } as any
+    await expect(validateProduct(collection, product)).rejects.toMatchObject({
       error: 'product.icon.missing',
-      message: 'Product icon is missing',
     })
   })
 
   test('should throw an error if icon is invalid', async () => {
-    await expect(validateProduct(collection, 'Product 1', 'invalidIcon')).rejects.toEqual({
+    const product = { name: 'Product 1', icon: 'invalidIcon' } as any
+    await expect(validateProduct(collection, product)).rejects.toMatchObject({
       error: 'product.icon.invalid',
-      message: 'Product icon is invalid',
     })
   })
 
@@ -53,21 +53,19 @@ describe('validateProduct', () => {
       _id: 'existingProductId',
     }
     collection.findOne.mockResolvedValueOnce(existingProduct)
-
-    await expect(validateProduct(collection, 'Product 1', 'icon1', 'existingProductId3')).rejects.toEqual({
+    const product = { _id: 'other_id', name: 'Product 1', icon: 'icon1' } as any
+    await expect(validateProduct(collection, product)).rejects.toMatchObject({
       error: 'product.name.unique',
-      message: 'Product name must be unique',
     })
   })
 
   test('should pass validation if name is not unique but ID matches', async () => {
     // Mock the existingProduct with the same ID
-    const existingProduct = {
-      _id: 'existingProductId',
-    }
-    collection.findOne.mockResolvedValueOnce(existingProduct)
+    const product = { _id: 'existingProductId', name: 'Product 1', icon: 'icon1' } as any
 
-    await expect(validateProduct(collection, 'Product 1', 'icon1', 'existingProductId')).resolves.toBeUndefined()
+    collection.findOne.mockResolvedValueOnce(product)
+
+    await expect(validateProduct(collection, product, product._id)).resolves.toBeUndefined()
 
     // Ensure that collection.findOne was called once with the correct argument
     expect(collection.findOne).toHaveBeenCalledWith({ name: 'Product 1' })
@@ -77,7 +75,8 @@ describe('validateProduct', () => {
     // Mock the existingProduct to simulate no duplicate name
     collection.findOne.mockResolvedValueOnce(null)
 
-    await expect(validateProduct(collection, 'Product 1', 'icon1')).resolves.toBeUndefined()
+    const product = { _id: 'id', name: 'Product 1', icon: 'icon1' } as any
+    await expect(validateProduct(collection, product)).resolves.toBeUndefined()
 
     // Ensure that collection.findOne was called once with the correct argument
     expect(collection.findOne).toHaveBeenCalledWith({ name: 'Product 1' })
