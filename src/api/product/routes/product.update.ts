@@ -21,6 +21,10 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     // Validate the product data, excluding the name of the product being updated
     await validate(collection, product, id)
 
+    // parse category to id 
+    product.categoryId = new ObjectId(product.category._id)
+    delete (product as any).category
+
     // Update the record
     delete (product as any)._id
     await collection.updateOne({ _id: new ObjectId(id) }, { $set: product })

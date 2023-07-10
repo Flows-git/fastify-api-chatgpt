@@ -1,5 +1,6 @@
 import { RouteHandlerMethod } from 'fastify'
 import { fastify } from '@/app'
+import { Product } from '@/types'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
@@ -18,12 +19,40 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     const skip = (page - 1) * perPage
 
     // Fetch products with pagination and sorting
-    const products = await collection
-      .find()
+    let products = (await collection
+      .aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'categoryId',
+            foreignField: '_id',
+            as: 'category',
+          },
+        },
+        {
+          $set: {
+            category: { $arrayElemAt: ['$category', 0] },
+          },
+        },
+        {
+          $project: {
+            categoryId: 0,
+          },
+        },
+      ])
       .skip(skip)
       .limit(parseInt(perPage))
       .sort({ [sortBy]: sortOrder })
-      .toArray()
+      .toArray()) as Product[]
+
+    products = (products as Product[]).map((product) => {
+      // When the product has no icon use the category icon
+      if (!product.icon && product.category?.icon) {
+        product.icon = product.category.icon
+      }
+
+      return product
+    })
 
     // Prepare response
     const response = {

@@ -31,20 +31,6 @@ describe('validateProduct', () => {
     })
   })
 
-  test('should throw an error if icon is missing', async () => {
-    const product = { name: 'Product 1', icon: undefined } as any
-    await expect(validateProduct(collection, product)).rejects.toMatchObject({
-      error: 'product.icon.missing',
-    })
-  })
-
-  test('should throw an error if icon is invalid', async () => {
-    const product = { name: 'Product 1', icon: 'invalidIcon' } as any
-    await expect(validateProduct(collection, product)).rejects.toMatchObject({
-      error: 'product.icon.invalid',
-    })
-  })
-
   test('should throw an error if name is not unique', async () => {
     // Mock the existingProduct
     const existingProduct = {

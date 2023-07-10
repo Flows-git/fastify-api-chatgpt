@@ -5,18 +5,19 @@ import fastifyStatic from '@fastify/static'
 import { connectMongo, getDb } from './db'
 
 import productRoutes from './api/product/product.routes'
+import productCategoryRoutes from './api/productCategory/product-category.routes'
 import iconsRoutes from './api/icons/icons.routes'
 
 const fastify = f({ logger: true})
 
 // Register the product routes
 fastify.register(productRoutes)
+fastify.register(productCategoryRoutes)
 fastify.register(iconsRoutes)
 
 fastify.register(fastifyStatic, {
   root: path.join(__dirname, '..', 'public'),
-  maxAge: 1000 * 60 * 60 * 24
-
+  maxAge: 1000 * 60 * 60 * 24, // 24 hrs
 })
 
 // Start the Fastify server
