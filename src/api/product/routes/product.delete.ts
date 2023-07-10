@@ -1,6 +1,6 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '../../../app'
-import { IdParam } from '../../../types'
+import { fastify } from '@/app'
+import { IdParam } from '@/types'
 import { ObjectId } from 'mongodb'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {

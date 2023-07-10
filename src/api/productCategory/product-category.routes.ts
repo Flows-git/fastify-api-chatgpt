@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import validateCategory from './product-category.validation'
-import { ProductCategory } from '../../types'
+import { ProductCategory } from '@/types'
 
 const categoryRoutes = async (fastify: FastifyInstance, options: any) => {
   const db = fastify.getDb().collection('categories') // Retrieve the db instance from fastify

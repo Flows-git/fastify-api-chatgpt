@@ -1,6 +1,6 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '../../../app'
-import { Product } from '../../../types'
+import { fastify } from '@/app'
+import { Product } from '@/types'
 import validate from '../product.validation'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {

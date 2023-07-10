@@ -1,6 +1,6 @@
 import { Collection } from 'mongodb'
-import { Product } from '../../types'
-import iconsData from '../../icons.data'
+import { Product } from '@/types'
+import iconsData from '@/icons.data'
 
 
 export default async (collection: Collection, product: Product, productId?: string) => {

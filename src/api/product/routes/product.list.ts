@@ -1,5 +1,5 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '../../../app'
+import { fastify } from '@/app'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {

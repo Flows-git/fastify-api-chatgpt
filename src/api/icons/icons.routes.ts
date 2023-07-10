@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import iconsData from '../../icons.data'
+import iconsData from '@/icons.data'
 
 export default async (fastify: FastifyInstance) => {
   fastify.get('/api/icons', async (request, reply) => {

@@ -1,7 +1,7 @@
 import validateProduct from './product.validation'
 
 // Mock the iconsData module
-jest.mock('../../icons.data', () => ['icon1', 'icon2', 'icon3'])
+jest.mock('@/icons.data', () => ['icon1', 'icon2', 'icon3'])
 
 describe('validateProduct', () => {
   let collection: any

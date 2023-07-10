@@ -1,7 +1,7 @@
 
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '../../../app'
-import { IdParam, Product } from '../../../types'
+import { fastify } from '@/app'
+import { IdParam, Product } from '@/types'
 import { ObjectId } from 'mongodb'
 import validate from '../product.validation'
 
