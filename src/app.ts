@@ -1,14 +1,24 @@
+import path from 'path'
 import f from 'fastify'
+import fastifyStatic from '@fastify/static'
+
 import { connectMongo, getDb } from './db'
 
-import productRoutes from './routes/productRoutes'
-import iconsRoutes from './routes/iconsRoutes'
+import productRoutes from './api/product/product.routes'
+import iconsRoutes from './api/icons/icons.routes'
 
-const fastify = f()
+const fastify = f({ logger: true})
 
 // Register the product routes
 fastify.register(productRoutes)
 fastify.register(iconsRoutes)
+
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, '..', 'public'),
+  maxAge: 1000 * 60 * 60 * 24
+
+})
+
 // Start the Fastify server
 const start = async () => {
   try {
@@ -23,3 +33,5 @@ const start = async () => {
 }
 
 start()
+
+export { fastify }

@@ -1,10 +1,10 @@
-import { Collection, Db, ObjectId } from 'mongodb'
+import { Collection } from 'mongodb'
+import { Product } from '../../types'
+import iconsData from '../../icons.data'
 
-import iconsData from '../icons.data'
-import { Product } from '../types'
 
-const validateProduct = async (collection: Collection, product: Product, productId?: string) => {
-  const {name, icon, _id, category } = product
+export default async (collection: Collection, product: Product, productId?: string) => {
+  const {name, icon } = product
   // Check for required fields
   if (!name) {
     throw { error: 'product.name.missing', message: 'Product name is missing' }
@@ -30,6 +30,11 @@ const validateProduct = async (collection: Collection, product: Product, product
   if (existingProduct && existingProduct._id.toString() !== productId?.toString()) {
     throw { error: 'product.name.unique', message: 'Product name must be unique' }
   }
+
+    // Check if the provided category ID exists
+    // const existingCategory = await collection.findOne({ _id: new ObjectId(category?._id) })
+    // if (!existingCategory) {
+    //   throw { error: 'category.not_found', message: 'Category not found' }
+    // }
 }
 
-export default validateProduct

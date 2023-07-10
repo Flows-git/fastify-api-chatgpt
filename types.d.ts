@@ -1,5 +1,4 @@
-import { FastifyInstance } from 'fastify';
-import { Db, MongoClient } from 'mongodb';
+import { Db } from 'mongodb';
 
 declare module 'fastify' {
   interface FastifyInstance {
