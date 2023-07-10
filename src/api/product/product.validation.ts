@@ -1,10 +1,9 @@
-import { Collection } from 'mongodb'
+import { Db, ObjectId } from 'mongodb'
 import { Product } from '@/types'
 import iconsData from '@/icons.data'
 
-
-export default async (collection: Collection, product: Product, productId?: string) => {
-  const {name, icon } = product
+export default async (db: Db, product: Product, productId?: string) => {
+  const { name, icon } = product
   // Check for required fields
   if (!name) {
     throw { error: 'product.name.missing', message: 'Product name is missing' }
@@ -20,10 +19,15 @@ export default async (collection: Collection, product: Product, productId?: stri
     throw { error: 'product.icon.invalid', message: 'Product icon is invalid' }
   }
 
-  // Check if the name is already taken 
-  const existingProduct = await collection.findOne({ name }) as Product
+  // Check if the name is already taken
+  const existingProduct = (await db.collection('products').findOne({ name })) as Product
   if (existingProduct && existingProduct._id.toString() !== productId?.toString()) {
     throw { error: 'product.name.unique', message: 'Product name must be unique' }
   }
-}
 
+  // Check if the provided category ID exists
+  const existingCategory = await db.collection('categories').findOne({ _id: new ObjectId(product.category?._id) })
+  if (!existingCategory) {
+    throw { error: 'category.not_found', message: 'Category not found' }
+  }
+}

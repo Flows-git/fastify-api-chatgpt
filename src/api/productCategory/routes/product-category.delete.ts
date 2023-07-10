@@ -1,11 +1,10 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '@/app'
 import { IdParam } from '@/types'
 import { ObjectId } from 'mongodb'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = fastify.getDb().collection('categories')
+    const collection = request.db.collection('categories')
     const { id } = request.params as IdParam
     const result = await collection.deleteOne({ _id: new ObjectId(id) })
 

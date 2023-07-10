@@ -1,10 +1,9 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '@/app'
 import { Product } from '@/types'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = fastify.getDb().collection('recipes')
+    const collection = request.db.collection('recipes')
     const { page = 1, perPage = 10, sortBy = 'name', order = 'ASC' } = request.query as any
 
     const sortOrder = order === 'DESC' ? -1 : 1

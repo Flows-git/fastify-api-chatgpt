@@ -1,13 +1,12 @@
 
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '@/app'
 import { IdParam, Product } from '@/types'
 import { ObjectId } from 'mongodb'
 import validate from '../product.validation'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = fastify.getDb().collection('products')
+    const collection = request.db.collection('products')
     const { id } = request.params as IdParam
     const product = request.body as Product
 
@@ -19,7 +18,7 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     }
 
     // Validate the product data, excluding the name of the product being updated
-    await validate(collection, product, id)
+    await validate(request.db, product, id)
 
     // parse category to id 
     product.categoryId = new ObjectId(product.category._id)

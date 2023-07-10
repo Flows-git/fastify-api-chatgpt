@@ -1,12 +1,11 @@
 
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '@/app'
 import { IdParam } from '@/types'
 import { ObjectId } from 'mongodb'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = fastify.getDb().collection('products')
+    const collection = request.db.collection('products')
     const { id } = request.params as IdParam
     const product = await collection.findOne({ _id: new ObjectId(id) })
 

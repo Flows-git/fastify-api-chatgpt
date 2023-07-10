@@ -1,11 +1,10 @@
 import { RouteHandlerMethod } from 'fastify'
-import { fastify } from '@/app'
 import { ProductCategory } from '@/types'
 import validate from '../product-category.validation'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = fastify.getDb().collection('categories')
+    const collection = request.db.collection('categories')
     const category = request.body as ProductCategory
 
     // Validate the category data

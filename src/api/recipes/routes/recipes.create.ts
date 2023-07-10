@@ -1,14 +1,12 @@
 import { RouteHandlerMethod } from 'fastify'
 import validate from '../recipes.validation'
-
 import { Recipe } from '@/types'
-import { fastify } from '@/app'
 import { ObjectId } from 'mongodb'
 
 
 // POST /api/recipies Endpoint
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
-    const collection = fastify.getDb().collection('recipes')
+    const collection = request.db.collection('recipes')
     try {
     const recipe = request.body as Recipe
 
