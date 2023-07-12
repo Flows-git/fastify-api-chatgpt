@@ -1,9 +1,9 @@
 import { Product } from '@/types'
 import { FastifyInstance } from 'fastify'
 import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
-import validateProduct from '../product.validation'
+import validateProduct from '../services/product.validation.service'
 
-jest.mock('../product.validation')
+jest.mock('../services/product.validation.service')
 
 describe('Product Update API Tests', () => {
   let fastify: FastifyInstance

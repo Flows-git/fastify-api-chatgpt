@@ -1,4 +1,4 @@
-import validateProduct from './product.validation'
+import validateProduct from '../services/product.validation.service'
 
 // Mock the iconsData module
 jest.mock('@/icons.data', () => ['icon1', 'icon2', 'icon3'])

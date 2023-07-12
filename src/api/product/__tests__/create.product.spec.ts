@@ -3,12 +3,12 @@ import dotenv from 'dotenv'
 import { Product } from '@/types'
 import { FastifyInstance } from 'fastify'
 import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
-import validateProduct from '../product.validation'
+import validateProduct from '../services/product.validation.service'
 import { ObjectId } from 'mongodb'
 
 // Load the environment variables from .env file
 dotenv.config()
-jest.mock('../product.validation')
+jest.mock('../services/product.validation.service')
 
 describe('Product Create API Tests', () => {
   let fastify: FastifyInstance
