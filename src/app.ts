@@ -2,14 +2,13 @@ import path from 'path'
 import f from 'fastify'
 import fastifyStatic from '@fastify/static'
 
-import { connectMongo, getDb } from './db'
-
 import productRoutes from './api/product/product.routes'
 import productCategoryRoutes from './api/productCategory/product-category.routes'
 import recipesRoutes from './api/recipes/recipes.routes'
 import iconsRoutes from './api/icons/icons.routes'
+import { connectMongo } from './db'
 
-const fastify = f({ logger: true})
+export const fastify = f({ logger: process.env.NODE_ENV !== 'test'})
 
 // Register the product routes
 fastify.register(productRoutes)
@@ -23,18 +22,26 @@ fastify.register(fastifyStatic, {
 })
 
 // Start the Fastify server
-const start = async () => {
+export const start = async () => {
   try {
-    await connectMongo() // Establish MongoDB connection
-    fastify.decorate('getDb', getDb) // Decorate fastify with the getDb function
+    const db = await connectMongo() // Establish MongoDB connection
+
+    fastify.decorate('db', db) // Decorate fastify with the getDb function
+    fastify.addHook('onRequest', (request, reply, done) => {
+      request.db = db
+      done()
+    })
+
     const addr = await fastify.listen({ port: 8090, host: '0.0.0.0' })
     console.log('Server running on ' + addr)
+    return fastify
   } catch (err) {
     console.error('Error starting server:', err)
     process.exit(1)
   }
 }
 
-start()
-
-export { fastify }
+// Start the server if this file is executed directly
+if (require.main === module) {
+  start()
+}
