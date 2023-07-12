@@ -5,6 +5,7 @@ import { FastifyInstance } from 'fastify'
 import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
 import validateProduct from '../services/product.validation.service'
 import { ObjectId } from 'mongodb'
+import { validationError } from '@/services/error.service'
 
 // Load the environment variables from .env file
 dotenv.config()
@@ -51,7 +52,7 @@ describe('Product Create API Tests', () => {
     const product: Partial<Product> = { name: 'invalid-product!' }
 
     // let the validation reject
-    jest.mocked(validateProduct).mockRejectedValue({ error: 'VALIDATION_ERROR' })
+    jest.mocked(validateProduct).mockRejectedValue(validationError('VALIDATION_ERROR'))
 
     // call create product EP
     const response = await fastify.inject({

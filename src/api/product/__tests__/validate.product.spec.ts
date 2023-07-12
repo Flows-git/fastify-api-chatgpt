@@ -1,3 +1,4 @@
+import { ERROR_CODE } from '@/services/error.service'
 import validateProduct from '../services/product.validation.service'
 
 // Mock the iconsData module
@@ -23,6 +24,7 @@ describe('validateProduct', () => {
   test('should throw an error if name is missing', async () => {
     const product = { name: undefined, icon: 'icon1' } as any
     await expect(validateProduct(db, product)).rejects.toMatchObject({
+      code: ERROR_CODE.VALIDATION,
       error: 'product.name.missing',
     })
   })
@@ -30,6 +32,7 @@ describe('validateProduct', () => {
   test('should throw an error if name is invalid', async () => {
     const product = { name: 'a', icon: 'icon1' } as any
     await expect(validateProduct(db, product)).rejects.toMatchObject({
+      code: ERROR_CODE.VALIDATION,
       error: 'product.name.invalid',
     })
   })
@@ -43,6 +46,7 @@ describe('validateProduct', () => {
 
     const product = { _id: 'other_id', name: 'Product 1', icon: 'icon1', category: { _id: 'category_id!'} } as any
     await expect(validateProduct(db, product)).rejects.toMatchObject({
+      code: ERROR_CODE.VALIDATION,
       error: 'product.name.unique',
     })
   })

@@ -1,4 +1,5 @@
 import { Db, Document, ObjectId } from 'mongodb'
+import { notFoundError } from './error.service'
 
 export interface ApiListParams {
   page?: number
@@ -60,7 +61,7 @@ export function dbCollectionQueryService<T extends Document>(
     const item = await listItems({ perPage: 1 }, readPipeline)
     // throw error when item not exist
     if (!item.data.length) {
-      throw new Error('item_not_found')
+      throw notFoundError('item_not_found')
     }
     // return the item
     return item.data[0]
@@ -85,7 +86,7 @@ export function dbCollectionQueryService<T extends Document>(
     const result = await collection.deleteOne({ _id: new ObjectId(id) })
     // throw error when item not exist
     if (result.deletedCount === 0) {
-      throw new Error('item_not_found')
+      throw notFoundError('item_not_found')
     }
     return true
   }
@@ -93,9 +94,9 @@ export function dbCollectionQueryService<T extends Document>(
   async function itemExists(id: string | ObjectId) {
     const existingProduct = await collection.findOne({ _id: new ObjectId(id) })
     if (!existingProduct) {
-      throw new Error('item_not_found')
+      throw notFoundError('item_not_found')
     }
-    return true
+    return
   }
 
   return {

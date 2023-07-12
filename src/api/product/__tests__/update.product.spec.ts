@@ -2,6 +2,7 @@ import { Product } from '@/types'
 import { FastifyInstance } from 'fastify'
 import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
 import validateProduct from '../services/product.validation.service'
+import { validationError } from '@/services/error.service'
 
 jest.mock('../services/product.validation.service')
 
@@ -47,7 +48,7 @@ describe('Product Update API Tests', () => {
     const product: Partial<Product> = { name: 'invalid-product!' }
 
     // let the validation reject
-    jest.mocked(validateProduct).mockRejectedValue({ error: 'VALIDATION_ERROR' })
+    jest.mocked(validateProduct).mockRejectedValue(validationError('VALIDATION_ERROR'))
 
     // call create product EP
     const response = await fastify.inject({
