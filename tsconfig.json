@@ -10,12 +10,14 @@
     ],
     "baseUrl": ".",
     "paths": {
-        "@/*": ["./src/*"]
+        "@/*": ["./src/*"],
+        "@tests/*": ["./tests/*"]
     }
   },
   "include": [
     "./src/**/*",
-    "./scripts/**/*"
+    "./scripts/**/*",
+    "./tests/**/*"
   ],
   "exclude": [
     "node_modules",

@@ -9,11 +9,13 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     const product = request.body as Product
 
     // Validate the product data
-    await validate( request.db, product)
+    await validate(request.db, product)
 
-    // parse category to id 
-    product.categoryId = new ObjectId(product.category._id)
-    delete (product as any).category
+    // parse category to id
+    if (product.category) {
+      product.categoryId = new ObjectId(product.category._id)
+      delete (product as any).category
+    }
 
     // Save the product in the "products" collection
     const result = await collection.insertOne(product)

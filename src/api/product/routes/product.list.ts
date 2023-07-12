@@ -39,9 +39,9 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
           },
         },
       ])
+      .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(parseInt(perPage))
-      .sort({ [sortBy]: sortOrder })
       .toArray()) as Product[]
 
     products = (products as Product[]).map((product) => {
