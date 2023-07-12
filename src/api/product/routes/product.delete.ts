@@ -5,7 +5,6 @@ import { productDbService } from '../services/product.db.service'
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
     const { id } = request.params as IdParam
-
     const dbService = productDbService(request.db)
     const result = await dbService.deleteItem(id)
     reply.code(200).send(result)

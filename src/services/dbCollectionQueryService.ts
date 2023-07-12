@@ -90,11 +90,20 @@ export function dbCollectionQueryService<T extends Document>(
     return true
   }
 
+  async function itemExists(id: string | ObjectId) {
+    const existingProduct = await collection.findOne({ _id: new ObjectId(id) })
+    if (!existingProduct) {
+      throw new Error('item_not_found')
+    }
+    return true
+  }
+
   return {
     listItems,
     readItem,
     createItem,
     updateItem,
     deleteItem,
+    itemExists,
   }
 }

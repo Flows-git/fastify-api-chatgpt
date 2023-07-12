@@ -2,7 +2,7 @@ import { Db, ObjectId } from 'mongodb'
 import { Product } from '@/types'
 import iconsData from '@/icons.data'
 
-export default async (db: Db, product: Product, productId?: string) => {
+export default async (db: Db, product: Product, productId?: string | ObjectId) => {
   const { name, icon } = product
   // Check for required fields
   if (!name) {
