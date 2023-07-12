@@ -6,9 +6,9 @@ import productRoutes from './api/product/product.routes'
 import productCategoryRoutes from './api/productCategory/product-category.routes'
 import recipesRoutes from './api/recipes/recipes.routes'
 import iconsRoutes from './api/icons/icons.routes'
-import { connectMongo } from './db'
+import { dbConnectionService } from './services/databaseConnection.service'
 
-export const fastify = f({ logger: process.env.NODE_ENV !== 'test'})
+export const fastify = f({ logger: process.env.NODE_ENV !== 'test' })
 
 // Register the product routes
 fastify.register(productRoutes)
@@ -16,6 +16,7 @@ fastify.register(productCategoryRoutes)
 fastify.register(recipesRoutes)
 fastify.register(iconsRoutes)
 
+// Register public folder
 fastify.register(fastifyStatic, {
   root: path.join(__dirname, '..', 'public'),
   maxAge: 1000 * 60 * 60 * 24, // 24 hrs
@@ -24,15 +25,9 @@ fastify.register(fastifyStatic, {
 // Start the Fastify server
 export const start = async () => {
   try {
-    const db = await connectMongo() // Establish MongoDB connection
-
-    fastify.decorate('db', db) // Decorate fastify with the getDb function
-    fastify.addHook('onRequest', (request, reply, done) => {
-      request.db = db
-      done()
-    })
-
-    const addr = await fastify.listen({ port: 8090, host: '0.0.0.0' })
+    await dbConnectionService(fastify)
+    const port = process.env.APP_PORT ? parseInt(process.env.APP_PORT) : 8090
+    const addr = await fastify.listen({ port, host: '0.0.0.0' })
     console.log('Server running on ' + addr)
     return fastify
   } catch (err) {
