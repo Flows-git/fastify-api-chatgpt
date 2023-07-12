@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
+import { clearDatabase, startApp, stopApp } from '@tests/app.start'
 
 describe('Product Delete API Tests', () => {
   let fastify: FastifyInstance

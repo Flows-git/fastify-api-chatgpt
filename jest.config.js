@@ -6,4 +6,6 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
+  globalSetup: '<rootDir>/tests/app.setup.ts',
+  globalTeardown: '<rootDir>/tests/app.teardown.ts',
 }

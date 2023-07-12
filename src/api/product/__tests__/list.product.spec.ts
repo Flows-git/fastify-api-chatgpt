@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { startApp, stopApp } from '@tests/appWithMemoryDB'
+import { startApp, stopApp } from '@tests/app.start'
 import { ObjectId } from 'mongodb'
 
 const testData = {

@@ -1,4 +1,5 @@
 import { Db } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -8,4 +9,8 @@ declare module 'fastify' {
   interface FastifyRequest {
     db: Db;
   }
+}
+
+declare global {
+  var mongo: MongoMemoryServer
 }

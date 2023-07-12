@@ -1,6 +1,6 @@
 import { Product } from '@/types'
 import { FastifyInstance } from 'fastify'
-import { clearDatabase, startApp, stopApp } from '@tests/appWithMemoryDB'
+import { clearDatabase, startApp, stopApp } from '@tests/app.start'
 import validateProduct from '../services/product.validation.service'
 import { validationError } from '@/services/error.service'
 
