@@ -3,6 +3,7 @@ import { RouteHandlerMethod } from 'fastify'
 import { IdParam, Product } from '@/types'
 import { ObjectId } from 'mongodb'
 import validate from '../product.validation'
+import { productDbService } from '../services/product.db.service'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
@@ -25,13 +26,10 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     delete (product as any).category
 
     // Update the record
-    delete (product as any)._id
-    await collection.updateOne({ _id: new ObjectId(id) }, { $set: product })
+    const dbService = productDbService(request.db)
+    const result = await dbService.updateItem(id, product)
 
-    // Fetch the updated record
-    const updatedProduct = await collection.findOne({ _id: new ObjectId(id) })
-
-    reply.code(200).send(updatedProduct)
+    reply.code(200).send(result)
   } catch (err: any) {
     console.error('Error updating product:', err)
     reply.code(400).send({ error: err.error, message: err.message })

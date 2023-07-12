@@ -1,22 +1,18 @@
 
 import { RouteHandlerMethod } from 'fastify'
-import { IdParam } from '@/types'
-import { ObjectId } from 'mongodb'
+import { productDbService } from '../services/product.db.service'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = request.db.collection('products')
-    const { id } = request.params as IdParam
-    const product = await collection.findOne({ _id: new ObjectId(id) })
-
-    if (!product) {
-      reply.code(404).send({ error: 'not_found', message: 'Product not found' })
-    } else {
-      reply.code(200).send(product)
-    }
+    const dbService = productDbService(request.db)
+    const product = await dbService.readItem(request.params as string)
+    reply.code(200).send(product)
   } catch (err) {
-    console.error('Error retrieving product:', err)
-    reply.code(500).send({ error: 'internal_server_error', message: 'Internal server error' })
+    if((err as Error).message === 'item_not_found') {
+      reply.code(404).send({ error: 'product.not_found', message: 'Product not found' })
+    } else {
+      reply.code(500).send({ error: 'internal_server_error', message: (err as Error).message })
+    }
   }
 }
 

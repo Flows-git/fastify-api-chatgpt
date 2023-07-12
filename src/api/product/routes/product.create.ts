@@ -2,10 +2,10 @@ import { RouteHandlerMethod } from 'fastify'
 import { Product } from '@/types'
 import validate from '../product.validation'
 import { ObjectId } from 'mongodb'
+import { productDbService } from '../services/product.db.service'
 
 const routeHandler: RouteHandlerMethod = async (request, reply) => {
   try {
-    const collection = request.db.collection('products')
     const product = request.body as Product
 
     // Validate the product data
@@ -18,12 +18,10 @@ const routeHandler: RouteHandlerMethod = async (request, reply) => {
     }
 
     // Save the product in the "products" collection
-    const result = await collection.insertOne(product)
+    const dbService = productDbService(request.db)
+    const result = await dbService.createItem(product)
 
-    // Fetch the created record
-    const createdProduct = await collection.findOne({ _id: result.insertedId })
-
-    reply.code(201).send(createdProduct)
+    reply.code(201).send(result)
   } catch (err: any) {
     console.error('Error saving product:', err)
     reply.code(400).send({ error: err.error, message: err.message })

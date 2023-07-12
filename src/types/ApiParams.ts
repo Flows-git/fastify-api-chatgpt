@@ -1,6 +1,6 @@
-import { ObjectId } from 'mongodb'
+import { Document, ObjectId } from 'mongodb'
 
-export interface DbModel {
+export interface DbModel extends Document {
   _id: ObjectId
 }
 export interface IdParam {
