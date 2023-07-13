@@ -1,4 +1,4 @@
-import { dbCollectionQueryService } from '@/services/dbCollectionQueryService'
+import { dbCollectionQueryService } from '@/services/dbCollectionQuery.service'
 import { Product } from '@/types'
 import { Db, ObjectId } from 'mongodb'
 import validate from './product.validation.service'

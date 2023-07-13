@@ -1,7 +1,9 @@
 node_modules
 .DS_Store
-src/icons.data.js
+src/icons.data.ts
 dist
 .nyc_output
 public/icons
 .env
+.vscode
+target
