@@ -20,7 +20,7 @@ export async function clearDatabase() {
   // Find all collections of the database
   const collections = await fastify.db.listCollections().toArray()
   // remove all entries in all collections
-  await collections.forEach(async (c) => {
-    return await fastify.db.collection(c.name).deleteMany({})
-  })
+  for(const collection of collections) {
+    await fastify.db.collection(collection.name).deleteMany({})
+  }
 }

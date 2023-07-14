@@ -1,4 +1,4 @@
-import { Db, Document, ObjectId } from 'mongodb'
+import { Db, Document, ObjectId, Sort } from 'mongodb'
 import { notFoundError } from './error.service'
 
 export interface ApiListParams {
@@ -37,10 +37,16 @@ export function dbCollectionQueryService<T extends Document>(
     const totalPageCount = Math.ceil(totalCount / perPage)
     // Calculate skip value based on page and perPage
     const skip = (page - 1) * perPage
+
+    let sort: Sort = ''
+    if(sortBy) {
+      sort = {[sortBy]: sortOrder}
+    }
+
     // Fetch products with pagination and sorting
     let items = await collection
       .aggregate<T>(listPipeline)
-      .sort({ [sortBy]: sortOrder })
+      .sort(sort)
       .skip(skip)
       .limit(parseInt(perPage as any))
       .toArray()
@@ -96,7 +102,7 @@ export function dbCollectionQueryService<T extends Document>(
     if (!existingProduct) {
       throw notFoundError('item_not_found')
     }
-    return
+    return true
   }
 
   return {
