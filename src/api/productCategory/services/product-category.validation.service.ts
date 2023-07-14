@@ -1,16 +1,18 @@
+import { validationError } from '@/services/error.service'
 import { ProductCategory } from '@/types'
-import { Collection } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 
-const validateCategory = async (collection: Collection, category: ProductCategory, id?: string) => {
+export default async (collection: Collection, category: ProductCategory, id?: string | ObjectId) => {
+
   const { name } = category
   // Check for required fields
   if (!name) {
-    throw { error: 'category.name.missing', message: 'Category name is missing' }
+    throw validationError('category.name.missing', 'Category name is missing')
   }
 
   // Check name length
   if (name.length < 2) {
-    throw { error: 'category.name.invalid', message: 'Category name is invalid' }
+    throw validationError('category.name.invalid', 'Category name is invalid')
   }
 
   // Check for missing icon
@@ -21,8 +23,7 @@ const validateCategory = async (collection: Collection, category: ProductCategor
   // Check if the category name is already taken
   const existingCategory = (await collection.findOne({ name })) as any
   if (existingCategory && existingCategory._id.toString() !== id?.toString()) {
-    throw { error: 'product.name.unique', message: 'Product name must be unique' }
+    throw validationError('category.name.unique', 'Category name must be unique')
   }
 }
 
-export default validateCategory

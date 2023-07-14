@@ -28,7 +28,7 @@ export function notFoundError(error: string, message?: string): AppError {
   return appError(ERROR_CODE.NOT_FOUND, error, message)
 }
 
-export function handleError(reply: FastifyReply, error: Error | AppError) {
+export function handleError(reply: FastifyReply, error: Error | AppError | unknown) {
   if((error as AppError).code) {
       reply.code((error as AppError).code).send(error)
   } else {

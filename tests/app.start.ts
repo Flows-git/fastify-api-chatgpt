@@ -12,6 +12,7 @@ export async function startApp() {
 
 // Stops the fastify server
 export async function stopApp() {
+  await clearDatabase()
   return await fastify.close()
 }
 

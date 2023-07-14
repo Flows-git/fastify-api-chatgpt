@@ -8,4 +8,5 @@ module.exports = {
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
   globalSetup: '<rootDir>/tests/app.setup.ts',
   globalTeardown: '<rootDir>/tests/app.teardown.ts',
+  collectCoverageFrom: ['./src/**'],
 }

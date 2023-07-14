@@ -106,6 +106,7 @@ export function dbCollectionQueryService<T extends Document>(
   }
 
   return {
+    collection,
     listItems,
     readItem,
     createItem,
