@@ -4,7 +4,7 @@ import fastifyStatic from '@fastify/static'
 
 import productRoutes from './api/product/product.routes'
 import productCategoryRoutes from './api/productCategory/product-category.routes'
-import recipesRoutes from './api/recipes/recipes.routes'
+import recipesRoutes from './api/recipe/recipe.routes'
 import iconsRoutes from './api/icons/icons.routes'
 import { dbConnectionService } from './services/databaseConnection.service'
 

@@ -9,4 +9,5 @@ module.exports = {
   globalSetup: '<rootDir>/tests/app.setup.ts',
   globalTeardown: '<rootDir>/tests/app.teardown.ts',
   collectCoverageFrom: ['./src/**'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/types'],
 }

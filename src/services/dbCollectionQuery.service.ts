@@ -65,9 +65,9 @@ export function dbCollectionQueryService<T extends Document>(
     }
   }
 
-  async function readItem(id: string | ObjectId) {
+  async function readItem(id: string | ObjectId, pipeline: Document[] = []) {
     // create pipeline to find element by id
-    const readPipeline: Document[] = [{ $match: { _id: new ObjectId(id) } }]
+    const readPipeline: Document[] = [{ $match: { _id: new ObjectId(id) } }, ...pipeline]
     // find element with list function limited to 1 result
     const item = await listItems({ perPage: 1 }, readPipeline)
     // throw error when item not exist
@@ -86,6 +86,7 @@ export function dbCollectionQueryService<T extends Document>(
     if (typeof ctx?.parse === 'function') {
       item = await ctx.parse({ item, collection, db })
     }
+    delete item._id
     const result = await collection.insertOne(item)
     // Fetch the created record
     return await readItem(result.insertedId)
