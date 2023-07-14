@@ -1,4 +1,3 @@
-import { Product } from '@/types'
 import { productDbService } from '../services/product.db.service'
 import { ObjectId } from 'mongodb'
 
@@ -43,10 +42,5 @@ describe('validateProduct', () => {
       name: 'test create',
       categoryId: new ObjectId('123456789012'),
     })
-  })
-
-  test('updateItem - should check if item exists', async () => {
-    await dbProductService.updateItem(new ObjectId('210987654321'), { name: 'test create' } as Product)
-    expect(dbCollectionQueryService.itemExists).toHaveBeenCalledWith(new ObjectId('210987654321'))
   })
 })

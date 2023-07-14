@@ -24,18 +24,16 @@ describe('Product Category API Tests', () => {
         name: 'Test ProductCategory',
         icon: 'icon1',
       }
-      // call create product EP
       const response = await fastify.inject({ method: 'POST', url: epUrl, payload: category })
       // check if the EP resloves and the response is as expected
       expect(response.json()).toEqual(expect.objectContaining(category))
       expect(response.statusCode).toEqual(201)
       // check if the data is correctly saved in DB
-      const createdProduct = await collection().findOne({ _id: new ObjectId(response.json()._id) })
-      expect(createdProduct).toEqual(expect.objectContaining(category))
+      const dbitem = await collection().findOne({ _id: new ObjectId(response.json()._id) })
+      expect(dbitem).toEqual(expect.objectContaining(category))
     })
 
     test(`should throw an validation error when the validation fails`, async () => {
-      // call create product EP
       const response = await fastify.inject({
         method: 'POST',
         url: epUrl,
@@ -115,8 +113,8 @@ describe('Product Category API Tests', () => {
         url: `${epUrl}/${categoryId}`,
       })
       expect(response.statusCode).toEqual(200)
-      // check in db if product was really deleted
-      expect(await fastify.db.collection('products').findOne({ _id: new ObjectId(categoryId) })).toBeNull()
+      // check in db if the category was really deleted
+      expect(await fastify.db.collection('categories').findOne({ _id: new ObjectId(categoryId) })).toBeNull()
     })
 
     test('should throw 404 when category does not exists', async () => {
@@ -137,7 +135,6 @@ describe('Product Category API Tests', () => {
     })
 
     test('should return the category and respond with 200', async () => {
-      // call delete product EP
       const response = await fastify.inject({
         method: 'GET',
         url: `${epUrl}/${categoryId}`,

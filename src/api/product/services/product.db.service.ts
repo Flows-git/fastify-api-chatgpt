@@ -40,9 +40,8 @@ export function productDbService(db: Db) {
 
   // override updateItem to validate and parse the data before update
   async function updateItem(id: string | ObjectId, item: Product) {
-    await dbService.itemExists(id)
     // parse category to id
-    if (item.category) {
+    if (item?.category) {
       item.categoryId = new ObjectId(item.category._id)
       delete (item as any).category
     }
