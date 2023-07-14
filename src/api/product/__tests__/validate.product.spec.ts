@@ -51,6 +51,26 @@ describe('validateProduct', () => {
     })
   })
 
+
+  test('should throw an error if icon is invalid', async () => {
+    const product = { name: 'Name', icon: 'invalid-icon' } as any
+    await expect(validateProduct(db, product)).rejects.toMatchObject({
+      code: ERROR_CODE.VALIDATION,
+      error: 'product.icon.invalid',
+    })
+  })
+
+  test('should throw an error if category not exist', async () => {
+    const product = { name: 'Name', icon: 'icon1' } as any
+    db.collection().findOne.mockResolvedValueOnce(undefined)
+
+    await expect(validateProduct(db, product)).rejects.toMatchObject({
+      code: ERROR_CODE.VALIDATION,
+      error: 'product.category.not_found',
+    })
+  })
+
+
   test('should pass validation if name is not unique but ID matches', async () => {
     // Mock the existingProduct with the same ID
     const product = { _id: 'existingProductId', name: 'Product 1', icon: 'icon1' } as any

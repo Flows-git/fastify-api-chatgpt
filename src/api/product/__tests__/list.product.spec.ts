@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import { startApp, stopApp } from '@tests/app.start'
+import { clearDatabase, startApp, stopApp } from '@tests/app.start'
 import { ObjectId } from 'mongodb'
 
 const testData = {
@@ -31,7 +31,10 @@ describe('Product List API Tests', () => {
     await fastify.db.collection('categories').insertMany(testData.categories)
     await fastify.db.collection('products').insertMany(testData.products)
   })
-  afterAll(async () => await stopApp())
+  afterAll(async () => {
+    await clearDatabase()
+    await stopApp()
+  })
 
   const searchCases = [
     {
@@ -60,27 +63,24 @@ describe('Product List API Tests', () => {
     },
   ]
 
-  test.each(searchCases)(
-    'should sort and pageinate - $searchParams ',
-    async ({ searchParams, result }) => {
-      const response = await fastify.inject({
-        method: 'GET',
-        url: `/api/products?${new URLSearchParams(searchParams as any).toString()}`,
-      })
-      // check if the EP response code is as expected
-      expect(response.statusCode).toEqual(200)
+  test.each(searchCases)('should sort and pageinate - $searchParams ', async ({ searchParams, result }) => {
+    const response = await fastify.inject({
+      method: 'GET',
+      url: `/api/products?${new URLSearchParams(searchParams as any).toString()}`,
+    })
+    // check if the EP response code is as expected
+    expect(response.statusCode).toEqual(200)
 
-      // should have expected length and order
-      expect(response.json().data.length).toEqual(result.dataLength)
-      if (result.dataLength > 0) {
-        expect(response.json().data[0].name).toEqual(result.firstData)
-        expect(response.json().data[result.dataLength - 1].name).toEqual(result.lastData)
-      }
-      // should have correct meta with totalCount and totalPageCount
-      expect(response.json().meta.totalCount).toEqual(11)
-      expect(response.json().meta.totalPageCount).toEqual(result.totalPageCount)
+    // should have expected length and order
+    expect(response.json().data.length).toEqual(result.dataLength)
+    if (result.dataLength > 0) {
+      expect(response.json().data[0].name).toEqual(result.firstData)
+      expect(response.json().data[result.dataLength - 1].name).toEqual(result.lastData)
     }
-  )
+    // should have correct meta with totalCount and totalPageCount
+    expect(response.json().meta.totalCount).toEqual(11)
+    expect(response.json().meta.totalPageCount).toEqual(result.totalPageCount)
+  })
   // check: should resolve products categoryId to the category Object
   // check: should use category icon when product has no own icon
 })
