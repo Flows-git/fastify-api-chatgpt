@@ -1,10 +1,11 @@
-import { Db, ObjectId, WithId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { Product } from '@/types'
 import iconsData from '@/icons.data'
 import { validationError } from '@/services/error.service'
+import { ValidationFunction } from '@/services/dbCollectionQuery.service'
 
-export default async (db: Db, product: Partial<Product>, productId?: string | ObjectId) => {
-  const { name, icon } = product
+const validate: ValidationFunction<Product> = async ({id, item, collection, db}) => {
+  const { name, icon } = item
   // Check for required fields
   if (!name) {
     throw validationError('product.name.missing', 'Product name is missing')
@@ -21,14 +22,16 @@ export default async (db: Db, product: Partial<Product>, productId?: string | Ob
   }
 
   // Check if the name is already taken
-  const existingProduct = (await db.collection('products').findOne({ name })) as WithId<Product>
-  if (existingProduct && existingProduct._id.toString() !== productId?.toString()) {
+  const existingProduct = (await collection.findOne({ name })) as WithId<Product>
+  if (existingProduct && existingProduct._id.toString() !== id?.toString()) {
     throw validationError('product.name.unique', 'Product name must be unique' )
   }
 
   // Check if the provided category ID exists
-  const existingCategory = await db.collection('categories').findOne({ _id: new ObjectId(product.category?._id) })
+  const existingCategory = await db.collection('categories').findOne({ _id: new ObjectId(item.category?._id) })
   if (!existingCategory) {
     throw validationError('product.category.not_found', 'Category not found' )
   }
 }
+
+export default validate

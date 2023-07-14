@@ -43,6 +43,16 @@ describe('Database Collection Query Service', () => {
     expect(item?._id).not.toBeUndefined()
   })
 
+  test('createItem - should call validation when set ', async () => {
+    const validate = jest.fn().mockImplementation() as any
+    dbService = dbCollectionQueryService(fastify.db, 'items', { validate })
+    await dbService.createItem({ name: 'create item' })
+    expect(validate).toHaveBeenCalled()
+    expect(validate).toHaveBeenCalledWith(
+      { item: expect.objectContaining({ name: 'create item' }), db: expect.anything(), collection: expect.anything() }
+    )
+  })
+
   // UPDATE - updateItem
   test('updateItem - should update the item with the passed ID and return it', async () => {
     // (with aggregation)
@@ -60,6 +70,19 @@ describe('Database Collection Query Service', () => {
     expect(async () => {
       await dbService.updateItem('123456789012', { name: 'not existing item' })
     }).rejects.toMatchObject(expect.objectContaining({ code: ERROR_CODE.NOT_FOUND }))
+  })
+
+
+  test('updateItem - should call validation when set ', async () => {
+    const { insertedId } = await fastify.db.collection('items').insertOne({ name: 'Item' })
+
+    const validate = jest.fn().mockImplementation() as any
+    dbService = dbCollectionQueryService(fastify.db, 'items', { validate })
+    await dbService.updateItem(insertedId, { name: 'updated item' })
+    expect(validate).toHaveBeenCalled()
+    expect(validate).toHaveBeenCalledWith(
+      { id: insertedId, item: expect.objectContaining({ name: 'updated item' }), db: expect.anything(), collection: expect.anything() }
+    )
   })
 
   // DELETE - delteItem

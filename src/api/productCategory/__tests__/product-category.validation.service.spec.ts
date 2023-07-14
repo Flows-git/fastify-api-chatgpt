@@ -1,13 +1,16 @@
 import { ERROR_CODE } from '@/services/error.service'
 import validate from '../services/product-category.validation.service'
+import { ProductCategory } from '@/types'
 
 // Mock the iconsData module
 jest.mock('@/icons.data', () => ['icon1', 'icon2', 'icon3'])
 
 describe('Validate Product Category', () => {
+  let db: any
   let collection: any
 
   beforeEach((done) => {
+    db = jest.fn()
     collection = {
       findOne: jest.fn(),
     }
@@ -19,8 +22,8 @@ describe('Validate Product Category', () => {
   })
 
   test('should throw an error if name is missing', async () => {
-    const category = { name: undefined, icon: 'icon1' } as any
-    await expect(validate(collection, category)).rejects.toMatchObject({
+    const category = { name: undefined, icon: 'icon1' } as Partial<ProductCategory>
+    await expect(validate({ item: category, db, collection })).rejects.toMatchObject({
       code: ERROR_CODE.VALIDATION,
       error: 'category.name.missing',
     })
@@ -28,7 +31,7 @@ describe('Validate Product Category', () => {
 
   test('should throw an error if name is invalid', async () => {
     const category = { name: 'a', icon: 'icon1' } as any
-    await expect(validate(collection, category)).rejects.toMatchObject({
+    await expect(validate({ item: category, db, collection })).rejects.toMatchObject({
       code: ERROR_CODE.VALIDATION,
       error: 'category.name.invalid',
     })
@@ -41,8 +44,8 @@ describe('Validate Product Category', () => {
     }
     collection.findOne.mockResolvedValueOnce(existingProduct).mockResolvedValueOnce({ _id: 'category_id!' })
 
-    const product = { _id: 'other_id', name: 'Product 1', icon: 'icon1', category: { _id: 'category_id!' } } as any
-    await expect(validate(collection, product)).rejects.toMatchObject({
+    const category = { _id: 'other_id', name: 'Product 1', icon: 'icon1', category: { _id: 'category_id!' } } as ProductCategory
+    await expect(validate({ item: category, db, collection })).rejects.toMatchObject({
       code: ERROR_CODE.VALIDATION,
       error: 'category.name.unique',
     })
@@ -50,11 +53,11 @@ describe('Validate Product Category', () => {
 
   test('should pass validation if name is not unique but ID matches', async () => {
     // Mock the existingProduct with the same ID
-    const product = { _id: 'existingProductId', name: 'Product 1', icon: 'icon1' } as any
+    const category = { _id: 'existingProductId', name: 'Product 1', icon: 'icon1' } as ProductCategory
 
-    collection.findOne.mockResolvedValueOnce(product).mockResolvedValueOnce({ _id: 'category_id!' })
+    collection.findOne.mockResolvedValueOnce(category).mockResolvedValueOnce({ _id: 'category_id!' })
 
-    await expect(validate(collection, product, product._id)).resolves.toBeUndefined()
+    await expect(validate({ id: category._id, item: category, db, collection })).resolves.toBeUndefined()
 
     // Ensure that collection.findOne was called once with the correct argument
     expect(collection.findOne).toHaveBeenCalledWith({ name: 'Product 1' })
@@ -64,8 +67,8 @@ describe('Validate Product Category', () => {
     // Mock the existingProduct to simulate no duplicate name
     collection.findOne.mockResolvedValueOnce(null)
 
-    const product = { _id: 'id', name: 'Product 1', icon: 'icon1' } as any
-    await expect(validate(collection, product)).resolves.toBeUndefined()
+    const category = { _id: 'id', name: 'Product 1', icon: 'icon1' } as ProductCategory
+    await expect(validate({ id: category._id, item: category, db, collection })).resolves.toBeUndefined()
 
     // Ensure that collection.findOne was called once with the correct argument
     expect(collection.findOne).toHaveBeenCalledWith({ name: 'Product 1' })

@@ -10,5 +10,5 @@ export interface Product extends Document {
 export interface ProductCategory extends Document {
   name: string
   icon: string
-  items: Array<Product>
+  items?: Array<Product>
 }

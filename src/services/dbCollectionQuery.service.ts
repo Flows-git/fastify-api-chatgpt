@@ -1,14 +1,22 @@
-import { Db, Document, ObjectId, Sort } from 'mongodb'
+import { Collection, Db, Document, ObjectId, Sort } from 'mongodb'
 import { notFoundError } from './error.service'
 import { ApiListParams, ApiListResponse } from '@/types'
 
+interface ValidationFunctionContext<T extends Document> {
+  item: Partial<T>
+  id?: string | ObjectId
+  db: Db
+  collection: Collection
+}
+export type ValidationFunction<T extends Document> = (ctx: ValidationFunctionContext<T>) => void | Promise<void>
 
 export function dbCollectionQueryService<T extends Document>(
   db: Db,
   collectionName: string,
-  pipeline: Document[] = []
+  ctx?: { pipeline?: Document[], validate?: ValidationFunction<T> }
 ) {
   const collection = db.collection(collectionName)
+  const pipeline = ctx?.pipeline ?? []
 
   // list the collection entries - sortable, paginateable, custom aggregation pipeline
   async function listItems(
@@ -29,8 +37,8 @@ export function dbCollectionQueryService<T extends Document>(
     const skip = (page - 1) * perPage
 
     let sort: Sort = ''
-    if(sortBy) {
-      sort = {[sortBy]: sortOrder}
+    if (sortBy) {
+      sort = { [sortBy]: sortOrder }
     }
 
     // Fetch products with pagination and sorting
@@ -64,12 +72,21 @@ export function dbCollectionQueryService<T extends Document>(
   }
 
   async function createItem(item: T) {
+    if (typeof ctx?.validate === 'function') {
+      await ctx.validate({ item, collection, db })
+    }
     const result = await collection.insertOne(item)
     // Fetch the created record
     return await readItem(result.insertedId)
   }
 
   async function updateItem(id: string | ObjectId, item: T) {
+    await itemExists(id)
+
+    if (typeof ctx?.validate === 'function') {
+      await ctx.validate({ id, item, collection, db })
+    }
+
     // Update the record
     delete item._id
     await collection.updateOne({ _id: new ObjectId(id) }, { $set: item })

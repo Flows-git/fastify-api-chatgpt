@@ -1,10 +1,9 @@
+import { ValidationFunction } from '@/services/dbCollectionQuery.service'
 import { validationError } from '@/services/error.service'
 import { ProductCategory } from '@/types'
-import { Collection, ObjectId } from 'mongodb'
 
-export default async (collection: Collection, category: Partial<ProductCategory>, id?: string | ObjectId) => {
-
-  const { name } = category
+const validate: ValidationFunction<ProductCategory> = async ({ id, item, collection }) => {
+  const { name } = item
   // Check for required fields
   if (!name) {
     throw validationError('category.name.missing', 'Category name is missing')
@@ -19,7 +18,7 @@ export default async (collection: Collection, category: Partial<ProductCategory>
   // if (!icon) {
   //   throw { error: 'category.icon.missing', message: 'Category icon is missing' }
   // }
-  
+
   // Check if the category name is already taken
   const existingCategory = await collection.findOne({ name })
   if (existingCategory && existingCategory._id.toString() !== id?.toString()) {
@@ -27,3 +26,4 @@ export default async (collection: Collection, category: Partial<ProductCategory>
   }
 }
 
+export default validate
