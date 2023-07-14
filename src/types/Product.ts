@@ -1,9 +1,9 @@
-import { Document, ObjectId } from 'mongodb'
+import { Document, ObjectId, WithId } from 'mongodb'
 
 export interface Product extends Document {
   name: string
   icon?: string
-  category: ProductCategory
+  category: WithId<ProductCategory>
   categoryId?: ObjectId
 }
 

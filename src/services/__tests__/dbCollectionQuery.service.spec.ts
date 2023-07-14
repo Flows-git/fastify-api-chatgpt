@@ -53,6 +53,16 @@ describe('Database Collection Query Service', () => {
     )
   })
 
+  test('createItem - should call data parse function when set ', async () => {
+    const parse = jest.fn().mockReturnThis() as any
+    const _dbService = dbCollectionQueryService(fastify.db, 'items', { parse })
+    await _dbService.createItem({ name: 'create item' })
+    expect(parse).toHaveBeenCalled()
+    expect(parse).toHaveBeenCalledWith(
+      { item: expect.objectContaining({ name: 'create item' }), db: expect.anything(), collection: expect.anything() }
+    )
+  })
+
   // UPDATE - updateItem
   test('updateItem - should update the item with the passed ID and return it', async () => {
     // (with aggregation)
@@ -82,6 +92,18 @@ describe('Database Collection Query Service', () => {
     expect(validate).toHaveBeenCalled()
     expect(validate).toHaveBeenCalledWith(
       { id: insertedId, item: expect.objectContaining({ name: 'updated item' }), db: expect.anything(), collection: expect.anything() }
+    )
+  })
+
+  test('updateItem - should call item parseing when set ', async () => {
+    const { insertedId } = await fastify.db.collection('items').insertOne({ name: 'Item' })
+
+    const parse = jest.fn().mockReturnThis() as any
+    dbService = dbCollectionQueryService(fastify.db, 'items', { parse })
+    await dbService.updateItem(insertedId, { name: 'updated item' })
+    expect(parse).toHaveBeenCalled()
+    expect(parse).toHaveBeenCalledWith(
+      { item: expect.objectContaining({ name: 'updated item' }), db: expect.anything(), collection: expect.anything() }
     )
   })
 

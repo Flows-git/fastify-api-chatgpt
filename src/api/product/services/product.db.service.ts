@@ -4,7 +4,7 @@ import { Db, ObjectId } from 'mongodb'
 import validate from './product.validation.service'
 
 export function productDbService(db: Db) {
-  const dbService = dbCollectionQueryService<Product>(db, 'products', {
+  return dbCollectionQueryService<Product>(db, 'products', {
     pipeline: [
       {
         $lookup: {
@@ -25,32 +25,13 @@ export function productDbService(db: Db) {
         },
       },
     ],
-    validate
+    validate,
+    parse: ({item}) => {
+      if (item.category) {
+        item.categoryId = new ObjectId(item.category._id)
+        delete (item as any).category
+      }
+      return item
+    }
   })
-
-  // override createItem to validate and parse the data before insertion
-  async function createItem(item: Product) {
-    // parse category to id
-    if (item.category) {
-      item.categoryId = new ObjectId(item.category._id)
-      delete (item as any).category
-    }
-    return dbService.createItem(item)
-  }
-
-  // override updateItem to validate and parse the data before update
-  async function updateItem(id: string | ObjectId, item: Product) {
-    // parse category to id
-    if (item?.category) {
-      item.categoryId = new ObjectId(item.category._id)
-      delete (item as any).category
-    }
-    return dbService.updateItem(id, item)
-  }
-
-  return {
-    ...dbService,
-    createItem,
-    updateItem,
-  }
 }

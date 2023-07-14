@@ -10,10 +10,17 @@ interface ValidationFunctionContext<T extends Document> {
 }
 export type ValidationFunction<T extends Document> = (ctx: ValidationFunctionContext<T>) => void | Promise<void>
 
+interface ParseunctionContext<T extends Document> {
+  item: T
+  db: Db
+  collection: Collection
+}
+export type ParseFunction<T extends Document> = (ctx: ParseunctionContext<T>) => T | Promise<T>
+
 export function dbCollectionQueryService<T extends Document>(
   db: Db,
   collectionName: string,
-  ctx?: { pipeline?: Document[], validate?: ValidationFunction<T> }
+  ctx?: { pipeline?: Document[]; validate?: ValidationFunction<T>; parse?: ParseFunction<T> }
 ) {
   const collection = db.collection(collectionName)
   const pipeline = ctx?.pipeline ?? []
@@ -75,6 +82,10 @@ export function dbCollectionQueryService<T extends Document>(
     if (typeof ctx?.validate === 'function') {
       await ctx.validate({ item, collection, db })
     }
+
+    if (typeof ctx?.parse === 'function') {
+      item = await ctx.parse({ item, collection, db })
+    }
     const result = await collection.insertOne(item)
     // Fetch the created record
     return await readItem(result.insertedId)
@@ -86,7 +97,9 @@ export function dbCollectionQueryService<T extends Document>(
     if (typeof ctx?.validate === 'function') {
       await ctx.validate({ id, item, collection, db })
     }
-
+    if (typeof ctx?.parse === 'function') {
+      item = await ctx.parse({ item, collection, db })
+    }
     // Update the record
     delete item._id
     await collection.updateOne({ _id: new ObjectId(id) }, { $set: item })
