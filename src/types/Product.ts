@@ -1,14 +1,13 @@
-import { ObjectId } from 'mongodb'
-import { DbModel } from './ApiParams'
+import { Document, ObjectId } from 'mongodb'
 
-export interface Product extends DbModel {
+export interface Product extends Document {
   name: string
   icon?: string
   category: ProductCategory
   categoryId?: ObjectId
 }
 
-export interface ProductCategory extends DbModel {
+export interface ProductCategory extends Document {
   name: string
   icon: string
   items: Array<Product>

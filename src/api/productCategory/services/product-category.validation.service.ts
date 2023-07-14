@@ -2,7 +2,7 @@ import { validationError } from '@/services/error.service'
 import { ProductCategory } from '@/types'
 import { Collection, ObjectId } from 'mongodb'
 
-export default async (collection: Collection, category: ProductCategory, id?: string | ObjectId) => {
+export default async (collection: Collection, category: Partial<ProductCategory>, id?: string | ObjectId) => {
 
   const { name } = category
   // Check for required fields
@@ -21,7 +21,7 @@ export default async (collection: Collection, category: ProductCategory, id?: st
   // }
   
   // Check if the category name is already taken
-  const existingCategory = (await collection.findOne({ name })) as any
+  const existingCategory = await collection.findOne({ name })
   if (existingCategory && existingCategory._id.toString() !== id?.toString()) {
     throw validationError('category.name.unique', 'Category name must be unique')
   }

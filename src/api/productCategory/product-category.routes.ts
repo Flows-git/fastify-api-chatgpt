@@ -1,16 +1,16 @@
 import { FastifyInstance } from 'fastify'
 import { productCategoryDbService } from './services/product-category.db.service'
 import { handleError } from '@/services/error.service'
-import { IdParam, ProductCategory } from '@/types'
+import { ApiListParams, IdParam, ProductCategory } from '@/types'
 
 export default async (fastify: FastifyInstance) => {
   // Create Product Category
   fastify.post('/api/categories', async (request, reply) => {
     try {
       const dbService = productCategoryDbService(request.db)
-      const response = await dbService.createItem(request.body as any)
+      const response = await dbService.createItem(request.body as ProductCategory)
       reply.code(201).send(response)
-    } catch (err: any) {
+    } catch (err) {
       handleError(reply, err)
     }
   })
@@ -33,7 +33,7 @@ export default async (fastify: FastifyInstance) => {
       const dbService = productCategoryDbService(request.db)
       const response = await dbService.updateItem(id, category)
       reply.code(200).send(response)
-    } catch (err: any) {
+    } catch (err) {
       handleError(reply, err)
     }
   })
@@ -52,7 +52,7 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/api/categories', async (request, reply) => {
     try {
       const dbService = productCategoryDbService(request.db)
-      const response = await dbService.listItems(request.query as any)
+      const response = await dbService.listItems(request.query as ApiListParams)
       reply.code(200).send(response)
     } catch (err) {
       handleError(reply, err)

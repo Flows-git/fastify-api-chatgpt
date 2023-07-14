@@ -1,9 +1,9 @@
-import { Db, ObjectId } from 'mongodb'
+import { Db, ObjectId, WithId } from 'mongodb'
 import { Product } from '@/types'
 import iconsData from '@/icons.data'
 import { validationError } from '@/services/error.service'
 
-export default async (db: Db, product: Product, productId?: string | ObjectId) => {
+export default async (db: Db, product: Partial<Product>, productId?: string | ObjectId) => {
   const { name, icon } = product
   // Check for required fields
   if (!name) {
@@ -21,7 +21,7 @@ export default async (db: Db, product: Product, productId?: string | ObjectId) =
   }
 
   // Check if the name is already taken
-  const existingProduct = (await db.collection('products').findOne({ name })) as Product
+  const existingProduct = (await db.collection('products').findOne({ name })) as WithId<Product>
   if (existingProduct && existingProduct._id.toString() !== productId?.toString()) {
     throw validationError('product.name.unique', 'Product name must be unique' )
   }

@@ -5,7 +5,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 
 export let fastify: FastifyInstance
 
-export default async function (globalConfig: any, projectConfig: any) {
+export default async function () {
   // Start the in-memory MongoDB server for testing
   const mongoServer = await MongoMemoryServer.create()
   const mongoUri = await mongoServer.getUri()

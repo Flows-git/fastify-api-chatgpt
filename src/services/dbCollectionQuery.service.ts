@@ -1,17 +1,7 @@
 import { Db, Document, ObjectId, Sort } from 'mongodb'
 import { notFoundError } from './error.service'
+import { ApiListParams, ApiListResponse } from '@/types'
 
-export interface ApiListParams {
-  page?: number
-  perPage?: number
-  sortBy?: string
-  order?: string
-}
-
-export interface ApiListResponse<T> {
-  data: T[]
-  meta: { totalPageCount: number; totalCount: number }
-}
 
 export function dbCollectionQueryService<T extends Document>(
   db: Db,

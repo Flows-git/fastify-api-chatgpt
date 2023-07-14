@@ -1,4 +1,4 @@
-export default async function (globalConfig: any, projectConfig: any) {
+export default async function () {
   await global.mongo.stop()
   console.log('MongoMemoryServer stopped')
 };

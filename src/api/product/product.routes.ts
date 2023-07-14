@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { productDbService } from './services/product.db.service'
-import { IdParam, Product } from '@/types'
+import { ApiListParams, IdParam, Product } from '@/types'
 import { handleError } from '@/services/error.service'
 
 export default async (fastify: FastifyInstance) => {
@@ -12,7 +12,7 @@ export default async (fastify: FastifyInstance) => {
       // Save the product in the "products" collection
       const result = await dbService.createItem(product)
       reply.code(201).send(result)
-    } catch (err: any) {
+    } catch (err) {
       handleError(reply, err as Error)
     }
   })
@@ -36,7 +36,7 @@ export default async (fastify: FastifyInstance) => {
       const product = request.body as Product
       const result = await dbService.updateItem(id, product)
       reply.code(200).send(result)
-    } catch (err: any) {
+    } catch (err) {
       handleError(reply, err as Error)
     }
   })
@@ -57,7 +57,7 @@ export default async (fastify: FastifyInstance) => {
   fastify.get('/api/products', async (request, reply) => {
     try {
       const dbService = productDbService(request.db)
-      const result = await dbService.listItems(request.query as any)
+      const result = await dbService.listItems(request.query as ApiListParams)
       reply.code(200).send(result)
     } catch (err) {
       handleError(reply, err as Error)
