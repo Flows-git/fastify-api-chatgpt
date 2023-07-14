@@ -90,11 +90,6 @@ describe('Product Product API Tests', () => {
         url: `${epUrl}/${itemId}`,
         payload: updatedProduct,
       })
-      console.log(response.json())
-      console.log({
-        ...updatedProduct,
-        ...{ category: { ...category, ...{ _id: category._id.toString() } } },
-      })
       // check if the EP resloves and the response is as expected
       expect(response.json()).toEqual({
         _id: expect.anything(),

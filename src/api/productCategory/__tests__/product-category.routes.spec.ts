@@ -26,11 +26,17 @@ describe('Product Category API Tests', () => {
       }
       const response = await fastify.inject({ method: 'POST', url: epUrl, payload: category })
       // check if the EP resloves and the response is as expected
-      expect(response.json()).toEqual(expect.objectContaining(category))
+      expect(response.json()).toEqual({
+        _id: expect.anything(),
+        ...category,
+      })
       expect(response.statusCode).toEqual(201)
       // check if the data is correctly saved in DB
       const dbitem = await collection().findOne({ _id: new ObjectId(response.json()._id) })
-      expect(dbitem).toEqual(expect.objectContaining(category))
+      expect(dbitem).toEqual({
+        _id: expect.anything(),
+        ...category,
+      })
     })
 
     test(`should throw an validation error when the validation fails`, async () => {
@@ -66,12 +72,18 @@ describe('Product Category API Tests', () => {
         payload: updatedCategory,
       })
       // check if the EP resloves and the response is as expected
-      expect(response.json()).toEqual(expect.objectContaining(updatedCategory))
+      expect(response.json()).toEqual({
+        _id: expect.anything(),
+        ...updatedCategory
+      })
       expect(response.statusCode).toEqual(200)
 
       // check if the data is correctly updated in DB
       const dbCategory = await collection().findOne({ _id: new ObjectId(response.json()._id) })
-      expect(dbCategory).toEqual(expect.objectContaining(updatedCategory))
+      expect(dbCategory).toEqual({
+        _id: expect.anything(),
+        ...updatedCategory
+      })
     })
 
     test(`should throw an validation error when the validation fails`, async () => {
