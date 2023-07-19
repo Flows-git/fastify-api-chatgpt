@@ -27,7 +27,7 @@ const validate: ValidationFunction<Recipe> = async ({ item }) => {
 
   // Validate each entry in the ingredients array
   for (const ingredient of ingredients) {
-    if (!ingredient.amount || !ingredient.ingredient) {
+    if (!ingredient.amount || !ingredient._id) {
       throw validationError('recipe.ingredients.invalid', 'Invalid recipe ingredients')
     }
   }

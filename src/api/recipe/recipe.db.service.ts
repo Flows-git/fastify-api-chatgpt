@@ -1,38 +1,39 @@
 import { dbCollectionQueryService } from '@/services/dbCollectionQuery.service'
-import { ApiListParams, Recipe } from '@/types'
+import { Recipe } from '@/types'
 import { Db, ObjectId } from 'mongodb'
 import validate from './recipe.validation'
 
 export function recipeDbService(db: Db) {
-  const dbService = dbCollectionQueryService<Recipe>(db, 'recipes', {
+  return dbCollectionQueryService<Recipe>(db, 'recipes', {
     validate,
     parse: ({ item }) => {
-      item.ingredients.forEach(ingredient => {
-        ingredient.ingredientId =  new ObjectId(ingredient.ingredient._id)
-        delete (ingredient as any).ingredient
+      item.ingredients.forEach((ingredient) => {
+        ingredient.ingredientId = new ObjectId(ingredient?._id)
+        delete (ingredient as any)._id
       })
       return item
     },
-  })
-
-  function listItems(params: ApiListParams) {
-    return dbService.listItems(params, [
+    listPipeline: [
       {
         $set: {
           ingredientsCount: { $size: '$ingredients' },
         },
       },
       {
-        $project: {
-          ingredients: 0,
-          instructions: 0
+        $addFields: {
+          'duration.total': {
+            $sum: ['$duration.preperation', '$duration.rest', '$duration.cook'],
+          },
         },
       },
-    ])
-  }
-
-  function readItem(item: string | ObjectId ) {
-    return dbService.readItem(item, [
+      {
+        $project: {
+          ingredients: 0,
+          instructions: 0,
+        },
+      },
+    ],
+    readPipeLine: [
       {
         $lookup: {
           from: 'products',
@@ -50,13 +51,11 @@ export function recipeDbService(db: Db) {
                 $mergeObjects: [
                   '$$this',
                   {
-                    ingredient: {
-                      $first: {
-                        $filter: {
-                          input: '$products',
-                          as: 'i',
-                          cond: { $eq: ['$$i._id', '$$this.ingredientId'] },
-                        },
+                    $first: {
+                      $filter: {
+                        input: '$products',
+                        as: 'i',
+                        cond: { $eq: ['$$i._id', '$$this.ingredientId'] },
                       },
                     },
                   },
@@ -67,14 +66,15 @@ export function recipeDbService(db: Db) {
         },
       },
       {
+        $addFields: {
+          'duration.total': {
+            $sum: ['$duration.preperation', '$duration.rest', '$duration.cook'],
+          },
+        },
+      },
+      {
         $unset: ['products', 'ingredients.ingredientId'],
       },
-    ])
-  }
-
-  return {
-    ...dbService,
-    listItems,
-    readItem
-  }
+    ],
+  })
 }

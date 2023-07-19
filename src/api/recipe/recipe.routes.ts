@@ -5,58 +5,57 @@ import { handleError } from '@/services/error.service'
 
 export default async (fastify: FastifyInstance) => {
   // Create Recipe
-  fastify.post('/api/recipes', async (request, reply) => {
+  fastify.post<{ Body: Recipe }>('/api/recipes', async (request, reply) => {
     try {
       const dbService = recipeDbService(fastify.db)
-      const recipe = request.body as Recipe
-      const result = await dbService.createItem(recipe)
+      const result = await dbService.createItem(request.body)
       reply.code(201).send(result)
     } catch (err) {
-      handleError(reply, err as Error)
+      handleError(reply, err)
     }
   })
 
   // Read Recipe
-  fastify.get('/api/recipes/:id', async (request, reply) => {
+  fastify.get<{ Params: string }>('/api/recipes/:id', async (request, reply) => {
     try {
       const dbService = recipeDbService(request.db)
-      const recipe = await dbService.readItem(request.params as string)
+      const recipe = await dbService.readItem(request.params)
       reply.code(200).send(recipe)
     } catch (err) {
-      handleError(reply, err as Error)
+      handleError(reply, err)
     }
   })
 
   // Update Recipe
-  fastify.post('/api/recipes/:id', async (request, reply) => {
+  fastify.post<{ Body: Recipe, Params: IdParam }>('/api/recipes/:id', async (request, reply) => {
     try {
       const dbService = recipeDbService(request.db)
-      const { id } = request.params as IdParam
-      const recipe = request.body as Recipe
+      const { id } = request.params
+      const recipe = request.body
       const result = await dbService.updateItem(id, recipe)
       reply.code(200).send(result)
     } catch (err) {
-      handleError(reply, err as Error)
+      handleError(reply, err)
     }
   })
 
   // Delete Recipe
-  fastify.delete('/api/recipes/:id', async (request, reply) => {
+  fastify.delete<{ Params: IdParam }>('/api/recipes/:id', async (request, reply) => {
     try {
-      const { id } = request.params as IdParam
+      const { id } = request.params
       const dbService = recipeDbService(request.db)
       const result = await dbService.deleteItem(id)
       reply.code(200).send(result)
     } catch (err) {
-      handleError(reply, err as Error)
+      handleError(reply, err)
     }
   })
 
   // List Recipes
-  fastify.get('/api/recipes', async (request, reply) => {
+  fastify.get<{ Querystring: ApiListParams }>('/api/recipes', async (request, reply) => {
     try {
       const dbService = recipeDbService(request.db)
-      const response = await dbService.listItems(request.query as ApiListParams)
+      const response = await dbService.listItems(request.query)
       reply.code(200).send(response)
     } catch (err) {
       handleError(reply, err)

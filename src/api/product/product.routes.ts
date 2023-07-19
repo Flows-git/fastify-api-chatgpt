@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import { productDbService } from './services/product.db.service'
 import { ApiListParams, IdParam, Product } from '@/types'
-import { handleError } from '@/services/error.service'
+import { handleError, validationError } from '@/services/error.service'
+import { ObjectId } from 'mongodb'
 
 export default async (fastify: FastifyInstance) => {
   // Create Product
@@ -45,6 +46,16 @@ export default async (fastify: FastifyInstance) => {
   fastify.delete<{ Params: IdParam }>('/api/products/:id', async (request, reply) => {
     try {
       const { id } = request.params
+      const productInRecipesCount = await fastify.db
+        .collection('recipes')
+        .countDocuments({ 'ingredients.ingredientId': new ObjectId(id) })
+      if (productInRecipesCount > 0) {
+        throw validationError(
+          'product.recipe.reference',
+          `Cannot delete a product which is used in ${productInRecipesCount} recipes`
+        )
+      }
+
       const dbService = productDbService(request.db)
       const result = await dbService.deleteItem(id)
       reply.code(200).send(result)
