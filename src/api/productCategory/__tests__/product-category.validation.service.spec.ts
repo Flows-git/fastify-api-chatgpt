@@ -1,6 +1,7 @@
 import { ERROR_CODE } from '@/services/error.service'
 import validate from '../services/product-category.validation.service'
 import { ProductCategory } from '@/types'
+import { ObjectId, WithId } from 'mongodb'
 
 // Mock the iconsData module
 jest.mock('@/icons.data', () => ['icon1', 'icon2', 'icon3'])
@@ -53,7 +54,7 @@ describe('Validate Product Category', () => {
 
   test('should pass validation if name is not unique but ID matches', async () => {
     // Mock the existingProduct with the same ID
-    const category = { _id: 'existingProductId', name: 'Product 1', icon: 'icon1' } as ProductCategory
+    const category = { _id: 'existingProductId' as unknown as ObjectId, name: 'Product 1', icon: 'icon1' } as WithId<ProductCategory>
 
     collection.findOne.mockResolvedValueOnce(category).mockResolvedValueOnce({ _id: 'category_id!' })
 
@@ -67,7 +68,7 @@ describe('Validate Product Category', () => {
     // Mock the existingProduct to simulate no duplicate name
     collection.findOne.mockResolvedValueOnce(null)
 
-    const category = { _id: 'id', name: 'Product 1', icon: 'icon1' } as ProductCategory
+    const category = { _id: 'id' as unknown as ObjectId, name: 'Product 1', icon: 'icon1' } as WithId<ProductCategory>
     await expect(validate({ id: category._id, item: category, db, collection })).resolves.toBeUndefined()
 
     // Ensure that collection.findOne was called once with the correct argument

@@ -1,4 +1,4 @@
-import { Recipe } from '@/types'
+import { Recipe, RecipeIngredient } from '@/types'
 import validate from '../recipe.validation'
 import { validationError } from '@/services/error.service'
 import { ObjectId } from 'mongodb'
@@ -13,8 +13,8 @@ describe('Recipe Validation', () => {
       amount: 2,
       duration: '30 mins',
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
       instructions: [
         { title: 'Step 1', description: 'Do this' },
@@ -30,8 +30,8 @@ describe('Recipe Validation', () => {
       amount: 2,
       duration: '30 mins',
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
       instructions: [
         { title: 'Step 1', description: 'Do this' },
@@ -50,8 +50,8 @@ describe('Recipe Validation', () => {
       amount: 'invalid' as any,
       duration: '30 mins',
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
       instructions: [
         { title: 'Step 1', description: 'Do this' },
@@ -69,8 +69,8 @@ describe('Recipe Validation', () => {
       name: 'Test Recipe',
       amount: 2,
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
       instructions: [
         { title: 'Step 1', description: 'Do this' },
@@ -125,8 +125,8 @@ describe('Recipe Validation', () => {
       amount: 2,
       duration: '30 mins',
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
     }
 
@@ -141,8 +141,8 @@ describe('Recipe Validation', () => {
       amount: 2,
       duration: '30 mins',
       ingredients: [
-        { amount: '100g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 1' } as any },
-        { amount: '200g', ingredient: { _id: new ObjectId(1), name: 'Ingredient 2' } as any },
+        { amount: '100g', _id: new ObjectId(1) } as RecipeIngredient,
+        { amount: '200g', _id: new ObjectId(1) } as RecipeIngredient,
       ],
       instructions: [{ title: 'Step 1', description: 'Do this' }, { description: 'Do that' } as any],
     }

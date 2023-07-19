@@ -5,19 +5,19 @@ import { ApiListParams, IdParam, ProductCategory } from '@/types'
 
 export default async (fastify: FastifyInstance) => {
   // Create Product Category
-  fastify.post('/api/categories', async (request, reply) => {
+  fastify.post<{ Body: ProductCategory }>('/api/categories', async (request, reply) => {
     try {
       const dbService = productCategoryDbService(request.db)
-      const response = await dbService.createItem(request.body as ProductCategory)
+      const response = await dbService.createItem(request.body)
       reply.code(201).send(response)
     } catch (err) {
       handleError(reply, err)
     }
   })
   // Read Product Category
-  fastify.get('/api/categories/:id', async (request, reply) => {
+  fastify.get<{ Params: IdParam }>('/api/categories/:id', async (request, reply) => {
     try {
-      const { id } = request.params as IdParam
+      const { id } = request.params
       const dbService = productCategoryDbService(request.db)
       const response = await dbService.readItem(id)
       reply.code(200).send(response)
@@ -26,10 +26,10 @@ export default async (fastify: FastifyInstance) => {
     }
   })
   // Update Product Category
-  fastify.post('/api/categories/:id', async (request, reply) => {
+  fastify.post<{ Body: ProductCategory; Params: IdParam }>('/api/categories/:id', async (request, reply) => {
     try {
-      const { id } = request.params as IdParam
-      const category = request.body as ProductCategory
+      const { id } = request.params
+      const category = request.body
       const dbService = productCategoryDbService(request.db)
       const response = await dbService.updateItem(id, category)
       reply.code(200).send(response)
@@ -38,9 +38,9 @@ export default async (fastify: FastifyInstance) => {
     }
   })
   // Delete Product Category
-  fastify.delete('/api/categories/:id', async (request, reply) => {
+  fastify.delete<{ Params: IdParam }>('/api/categories/:id', async (request, reply) => {
     try {
-      const { id } = request.params as IdParam
+      const { id } = request.params
       const dbService = productCategoryDbService(request.db)
       const response = await dbService.deleteItem(id)
       reply.code(200).send(response)
@@ -49,10 +49,10 @@ export default async (fastify: FastifyInstance) => {
     }
   })
   // List Product Category
-  fastify.get('/api/categories', async (request, reply) => {
+  fastify.get<{ Querystring: ApiListParams }>('/api/categories', async (request, reply) => {
     try {
       const dbService = productCategoryDbService(request.db)
-      const response = await dbService.listItems(request.query as ApiListParams)
+      const response = await dbService.listItems(request.query)
       reply.code(200).send(response)
     } catch (err) {
       handleError(reply, err)

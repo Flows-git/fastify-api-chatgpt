@@ -1,10 +1,8 @@
-import { Document, ObjectId, WithId } from 'mongodb'
+import { Document, WithId } from 'mongodb'
 import type { Product } from './Product'
 
-export interface RecipeIngredient {
+export interface RecipeIngredient extends WithId<Product> {
   amount: string // how much you need of the ingredient
-  ingredient: WithId<Product>
-  ingredientId?: ObjectId
 }
 export interface RecipeInstructions {
   title: string

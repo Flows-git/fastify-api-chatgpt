@@ -7,7 +7,7 @@ export interface Product extends Document {
   categoryId?: ObjectId
 }
 
-export interface ProductCategory extends Document {
+export interface ProductCategory {
   name: string
   icon: string
   items?: Array<Product>

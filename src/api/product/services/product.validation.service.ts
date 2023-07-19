@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { Product } from '@/types'
 import iconsData from '@/icons.data'
 import { validationError } from '@/services/error.service'
@@ -22,7 +22,7 @@ const validate: ValidationFunction<Product> = async ({id, item, collection, db})
   }
 
   // Check if the name is already taken
-  const existingProduct = (await collection.findOne({ name })) as WithId<Product>
+  const existingProduct = (await collection.findOne<Product>({ name }))
   if (existingProduct && existingProduct._id.toString() !== id?.toString()) {
     throw validationError('product.name.unique', 'Product name must be unique' )
   }
