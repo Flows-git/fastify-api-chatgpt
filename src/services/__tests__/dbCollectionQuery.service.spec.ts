@@ -138,4 +138,10 @@ describe('Database Collection Query Service', () => {
 
   // LIST - listItems
   // test('listItems - should filter and paginate the collection items correctly', async () => {})
+
+  // describe('Aggregation pipelines', () => {
+  //   test('should use "pipeline" prop for read and list requests', async () => {})
+  //   test('should use "pipeline" prop for read requests and "listPipeline" prop for list requests', async () => {})
+  //   test('should use "pipeline" prop for list requests and "readPipeline" prop for read requests', async () => {})
+  // })
 })

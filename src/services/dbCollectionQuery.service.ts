@@ -20,21 +20,21 @@ export type ParseFunction<T extends Document> = (ctx: ParseunctionContext<T>) =>
 export function dbCollectionQueryService<T extends Document>(
   db: Db,
   collectionName: string,
-  ctx?: { pipeline?: Document[]; validate?: ValidationFunction<T>; parse?: ParseFunction<T> }
+  ctx?: { pipeline?: Document[]; validate?: ValidationFunction<T>; parse?: ParseFunction<T>, readPipeLine?: Document[], listPipeline?: Document[] }
 ) {
   const collection = db.collection(collectionName)
-  const pipeline = ctx?.pipeline ?? []
+
+  function getReadPipeline() {
+    return ctx?.readPipeLine ?? ctx?.pipeline ?? [] 
+  }
+
+  function getListPipeline() {
+    return ctx?.listPipeline ?? ctx?.pipeline ?? []
+  }
 
   // list the collection entries - sortable, paginateable, custom aggregation pipeline
   async function listItems(
-    { page = 1, perPage = 10, sortBy = 'name', order = 'ASC' }: ApiListParams,
-    listPipeline?: Document[]
-  ): Promise<ApiListResponse<T>> {
-    if (!listPipeline) {
-      listPipeline = pipeline
-    } else {
-      listPipeline = [...pipeline, ...listPipeline]
-    }
+    { page = 1, perPage = 10, sortBy = 'name', order = 'ASC' }: ApiListParams): Promise<ApiListResponse<T>> {
     const sortOrder = order === 'DESC' ? -1 : 1
     // Count total number of products
     const totalCount = await collection.countDocuments()
@@ -50,7 +50,7 @@ export function dbCollectionQueryService<T extends Document>(
 
     // Fetch products with pagination and sorting
     let items = await collection
-      .aggregate<T>(listPipeline)
+      .aggregate<T>(getListPipeline())
       .sort(sort)
       .skip(skip)
       .limit(parseInt(perPage as any))
@@ -67,15 +67,18 @@ export function dbCollectionQueryService<T extends Document>(
 
   async function readItem(id: string | ObjectId, pipeline: Document[] = []) {
     // create pipeline to find element by id
-    const readPipeline: Document[] = [{ $match: { _id: new ObjectId(id) } }, ...pipeline]
-    // find element with list function limited to 1 result
-    const item = await listItems({ perPage: 1 }, readPipeline)
+    const readPipeline: Document[] = [{ $match: { _id: new ObjectId(id) } }, ...getReadPipeline(), ...pipeline]
+    
+    let items = await collection
+      .aggregate<T>(readPipeline)
+      .limit(1)
+      .toArray()
     // throw error when item not exist
-    if (!item.data.length) {
+    if (!items.length) {
       throw notFoundError('item_not_found')
     }
     // return the item
-    return item.data[0]
+    return items[0]
   }
 
   async function createItem(item: T) {
